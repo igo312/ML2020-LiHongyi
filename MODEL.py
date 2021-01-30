@@ -3,33 +3,98 @@ import random
 
 seed = 333
 class LINEAR(object):
-    def __init__(self, lr_rate=0.01, init_mode=None):
-        # choose the initialization mode(default:None), in defualt it will be initilized by `random.random(0,1)`
-        self.__initialize(init_mode)
+    def __init__(self, dim, lr_rate=0.01, init_mode=None):
         self.lr_rate=lr_rate
         self.flag = False
+        self.dim = dim
+        self.m_0 = 0 # momentum param
+        self.grad = 0 # commulative gradient
+        self._test = False
+        # choose the initialization mode(default:None), in defualt it will be initilized by `random.random(0,1)`
+        self.__initialize(init_mode)
     def __initialize(self,mode):
         random.seed(seed)
         if not mode:
             # Defualt initilization
-            self.w = np.random.random([18*9,1])
-            self.b = np.random.random(1)
+            self.w = np.random.random([self.dim,1])
 
-    def loss(self, inputs, y_true):
-        y_pre = np.matmul(inputs, self.w)+self.b
-        _loss = np.sum(np.square(y_pre - y_true))
+    def loss(self, inputs, y_true, beta1=0.2, beta2=0.9):
+        y_pre = np.matmul(inputs, self.w)
+        _loss = np.sqrt(np.mean(np.abs(y_pre - y_true)))
         self.flag=True
-        return _loss, self.__gradient(inputs, y_pre,y_true)
+        if not self._test:
+            return _loss, self.__gradient(inputs, y_pre,y_true, beta1, beta2)
+        else:
+            return _loss
 
-    def step(self, grad_w, grad_b):
+    def step(self, grad_w):
         if not self.flag:
             raise AssertionError('Must input a new set and calculate the loss then you can execute function `step()`')
         self.w = self.w - self.lr_rate*grad_w
-        self.b = self.b - self.lr_rate*grad_b
         self.flag = False
 
     # calculate the gradient
-    def __gradient(self,inputs,y_pre, y_true):
+    # 计算梯度
+    def __gradient(self,inputs,y_pre, y_true, beta1, beta2):
+        # a simple adam
         grad_w = 2*np.matmul(inputs.transpose(),(y_pre-y_true))
-        grad_b = 2*(y_pre-y_true)
-        return [grad_w, grad_b]
+        m = self.m_0*beta1 + grad_w*(1-beta1)
+        self.m_0 = m
+        self.grad = self.grad*beta2 + np.abs(grad_w)*(1-beta2) # it should be `abs` instead of `square`
+        return m/np.sqrt(self.grad)
+
+    # To decide whether to train or test
+    # 决定模式：训练&测试
+    def test(self):
+        self._test = True
+    def train(self):
+        self._test = False
+
+
+class BINOMIAL(object):
+    def __init__(self, dim, lr_rate=0.01, init_mode=None):
+        self.lr_rate=lr_rate
+        self.flag = False
+        self.dim = dim
+        self.m_0 = 0 # momentum param
+        self.grad = 0 # commulative gradient
+        self._test = False
+        # choose the initialization mode(default:None), in defualt it will be initilized by `random.random(0,1)`
+        self.__initialize(init_mode)
+    def __initialize(self,mode):
+        random.seed(seed)
+        if not mode:
+            # Defualt initilization
+            self.w1 = np.random.random([self.dim,1])
+
+    def loss(self, inputs, y_true, beta1=0.2, beta2=0.9):
+        y_pre = np.matmul(inputs, self.w)
+        _loss = np.sqrt(np.mean(np.square(y_pre - y_true)))
+        self.flag=True
+        if not self._test:
+            return _loss, self.__gradient(inputs, y_pre,y_true, beta1, beta2)
+        else:
+            return _loss
+
+    def step(self, grad_w):
+        if not self.flag:
+            raise AssertionError('Must input a new set and calculate the loss then you can execute function `step()`')
+        self.w = self.w - self.lr_rate*grad_w
+        self.flag = False
+
+    # calculate the gradient
+    # 计算梯度
+    def __gradient(self,inputs,y_pre, y_true, beta1, beta2):
+        # a simple adam
+        grad_w = 2*np.matmul(inputs.transpose(),(y_pre-y_true))
+        m = self.m_0*beta1 + grad_w*(1-beta1)
+        self.m_0 = m
+        self.grad = self.grad*beta2 + np.abs(grad_w)*(1-beta2)
+        return m/np.sqrt(self.grad)
+
+    # To decide whether to train or test
+    # 决定模式：训练&测试
+    def test(self):
+        self._test = True
+    def train(self):
+        self._test = False

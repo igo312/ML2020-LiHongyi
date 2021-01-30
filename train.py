@@ -40,7 +40,7 @@ def data():
         for j in range(len(x[0])):  # 18 * 9
             if std_x[j] != 0:
                 x[i][j] = (x[i][j] - mean_x[j]) / std_x[j]
-
+    # x = np.concatenate((x, np.ones([x.shape[0],1])), axis=1)
     # data split
     x_train_set = x[: math.floor(len(x) * 0.8), :]
     y_train_set = y[: math.floor(len(y) * 0.8), :]
