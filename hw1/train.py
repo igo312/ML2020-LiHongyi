@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import math
 def data():
-    train_path = 'hw1/dataset/train.csv'
+    train_path = 'dataset/train.csv'
     data = pd.read_csv(train_path, encoding = 'big5')
 
     ############## data precessing #############
