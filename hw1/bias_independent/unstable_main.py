@@ -3,27 +3,23 @@
 1. learning rate
 2. initilization
 '''
-'''
-# The problem of convergence
-1. learning rate
-2. initilization
-'''
-from MODEL import LINEAR, QUADRATIC
+#from MODEL import LINEAR
+from unstable_model import LINEAR
 from train import data
 import math
 
 itertime = 100000
-beta1=0
-beta2=0
+beta1=0.5
+beta2=0.1
 if __name__ == '__main__':
     x_train, y_train, x_val, y_val = data()
-    #model = LINEAR(dim=18*9+1,lr_rate=0.000001)
-    model = QUADRATIC(dim=18*9+1, lr_rate=0.00001)
+    #model = LINEAR(dim=18*9,lr_rate=0.000001)
+    model = LINEAR(lr_rate=0.000001)
     val_loss = float('inf')
     for t in range(itertime):
         model.train()
-        loss, grad = model.loss(x_train, y_train, beta1=beta1, beta2=beta2)       # MSE loss
-        model.step(*grad)
+        loss, [grad_w,grad_b] = model.loss(x_train, y_train, beta1=beta1, beta2=beta2)       # MSE loss
+        model.step(grad_w,grad_b)
         # print('Training Times:{} loss is {:.2f}'.format(t, loss))
         if t%1000==0 and t>0:
             model.test()
