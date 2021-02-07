@@ -1,0 +1,2 @@
+- Please go to [kaggle](https://www.kaggle.com/c/ml2020spring-hw2) to get the data
+- if you get enough memory, I recommend use `dataset.py` to generate a `npy` file to load data quickly.
