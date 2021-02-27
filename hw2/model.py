@@ -62,5 +62,6 @@ class SIGMOID(object):
         return 1 / (1 + np.exp(-x))
 
     def _accuracy(self, pre,logits):
+        # return 1 - np.mean(np.abs(pre - logits))
         return 1-(np.where(abs(pre-logits)>0.5)[0].shape[0]/ logits.shape[0])
 

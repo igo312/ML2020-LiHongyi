@@ -12,7 +12,7 @@ if __name__ == '__main__':
     #x_train,y_train,x_val,y_val = gen(0.1)
     # 2. already execute dataset.py and get npy file, reload it
     x_train,y_train,x_val,y_val = npy_gen()
-    model = SIGMOID(dim=510, lr_rate=0.0005)
+    model = SIGMOID(dim=510, lr_rate=0.0002)
     val_loss = float('inf')
     for t in tqdm(range(itertime)):
         model.train()
